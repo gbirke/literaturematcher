@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use Birke\LiteratureMatcher\LiteratureLexer;
+use Birke\LiteratureMatcher\Token;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,9 +15,7 @@ class LiteratureLexerTest extends TestCase
 	 * @dataProvider provideAuthorAndYear
 	 */
 	public function testAuthorLexing( string $text, array $expectedTokens ): void {
-		$lexer = new LiteratureLexer();
-		$tokens = $lexer->tokenize( $text );
-		$tokens = $this->removePositions( $tokens );
+		$tokens = LiteratureLexer::run( $text );
 		$this->assertEquals( $expectedTokens, $tokens );
 	}
 
@@ -24,48 +23,38 @@ class LiteratureLexerTest extends TestCase
 		yield 'Basic Author' => [
 			'Abberley, P. (1987):',
 			[
-				['token' => 'word', 'value' => 'Abberley' ],
-				['token' => 'comma', 'value' => ',' ],
-				['token' => 'space', 'value' => ' ' ],
-				['token' => 'word', 'value' => 'P' ],
-				['token' => 'dot', 'value' => '.' ],
-				['token' => 'space', 'value' => ' ' ],
-				['token' => 'openBrace', 'value' => '(' ],
-				['token' => 'year', 'value' => '1987' ],
-				['token' => 'closeBrace', 'value' => ')' ],
-				['token' => 'colon', 'value' => ':' ],
+				new Token('word', 'Abberley'),
+				new Token('comma', ', '),
+				new Token('word', 'P'),
+				new Token('dot', '.'),
+				new Token('space', ' '),
+				new Token('openBrace', '('),
+				new Token('year', '1987'),
+				new Token('closeBrace', ')'),
+				new Token('colon', ':'),
 			]
 		];
 
 		yield 'Author with original date' => [
 			'Adorno, T.W. (2003) [1965]:',
 			[
-				['token' => 'word', 'value' => 'Adorno' ],
-				['token' => 'comma', 'value' => ',' ],
-				['token' => 'space', 'value' => ' ' ],
-				['token' => 'word', 'value' => 'T' ],
-				['token' => 'dot', 'value' => '.' ],
-				['token' => 'word', 'value' => 'W' ],
-				['token' => 'dot', 'value' => '.' ],
-				['token' => 'space', 'value' => ' ' ],
-				['token' => 'openBrace', 'value' => '(' ],
-				['token' => 'year', 'value' => '2003' ],
-				['token' => 'closeBrace', 'value' => ')' ],
-				['token' => 'space', 'value' => ' ' ],
-				['token' => 'openBracket', 'value' => '[' ],
-				['token' => 'year', 'value' => '1965' ],
-				['token' => 'closeBracket', 'value' => ']' ],
-				['token' => 'colon', 'value' => ':' ],
+				new Token('word', 'Adorno'),
+				new Token('comma', ', '),
+				new Token('word', 'T'),
+				new Token('dot', '.'),
+				new Token('word', 'W'),
+				new Token('dot', '.'),
+				new Token('space', ' '),
+				new Token('openBrace', '('),
+				new Token('year', '2003'),
+				new Token('closeBrace', ')'),
+				new Token('space', ' '),
+				new Token('openBracket', '['),
+				new Token('year', '1965'),
+				new Token('closeBracket', ']'),
+				new Token('colon', ':'),
 			]
 		];
 
-	}
-
-	private function removePositions(array $tokens)
-	{
-		return array_map(
-			fn($token) => ['token' => $token['token'], 'value' => $token['value']],
-			$tokens
-		);
 	}
 }
