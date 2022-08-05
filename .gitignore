@@ -1,0 +1,14 @@
+
+### Composer ###
+composer.phar
+/vendor/
+
+### PHPUnit ###
+# Reference: https://phpunit.de/
+
+# Generated files
+.phpunit.result.cache
+.phpunit.cache
+
+/phpunit.xml
+

@@ -1,0 +1,14 @@
+{
+    "autoload": {
+      "psr-4": {
+        "Birke\\LiteratureMatcher\\": "src/"
+      }
+    },
+    "require": {
+        "guzzlehttp/guzzle": "^7.0",
+        "maximebf/parsec": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    }
+}
