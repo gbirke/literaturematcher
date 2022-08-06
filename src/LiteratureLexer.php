@@ -44,6 +44,7 @@ class LiteratureLexer {
 
 	private static function match( string $source, int $offset ): Token {
 		$rest = substr( $source, $offset );
+		// TODO compile terminals into one regex and check for matches
 		foreach( self::TERMINALS as $name => $pattern ) {
 			if ( preg_match($pattern, $rest, $matches ) ) {
 				return new Token( $name, $matches[1] );
