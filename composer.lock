@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f835f3bb38ae40fe9252a8266aab30c0",
+    "content-hash": "cf42bfb021bc5ef13dbb70829bffc2ed",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -328,53 +328,6 @@
                 }
             ],
             "time": "2022-06-20T21:43:11+00:00"
-        },
-        {
-            "name": "maximebf/parsec",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/maximebf/parsec.git",
-                "reference": "cb7ad5973b6891f5ea2b287e15deefb4a6e500af"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/maximebf/parsec/zipball/cb7ad5973b6891f5ea2b287e15deefb4a6e500af",
-                "reference": "cb7ad5973b6891f5ea2b287e15deefb4a6e500af",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Parsec": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Maxime Bouroumeau-Fuseau",
-                    "email": "maxime.bouroumeau@gmail.com",
-                    "homepage": "http://maximebf.com"
-                }
-            ],
-            "description": "Contextual parser library for PHP5.3",
-            "homepage": "https://github.com/maximebf/parsec",
-            "keywords": [
-                "contextual",
-                "lexer",
-                "parser"
-            ],
-            "support": {
-                "issues": "https://github.com/maximebf/parsec/issues",
-                "source": "https://github.com/maximebf/parsec/tree/1.0.0"
-            },
-            "time": "2012-08-18T10:50:45+00:00"
         },
         {
             "name": "psr/http-client",
