@@ -6,12 +6,12 @@ $db = \Doctrine\DBAL\DriverManager::getConnection([ 'url' => 'sqlite://./literat
 
 $zoteroCount = $db->executeQuery("SELECT COUNT(*) from zotero_entry")->fetchOne();
 
-$titleQuery = $db->prepare( "SELECT data from zotero_entry WHERE title=:title" );
+$fulltextQuery = $db->prepare( "SELECT data from zotero_entry ze JOIN zotero_titles zt ON ze.id=zt.rowid WHERE zt.title MATCH :title" );
 
 printf("%d eintraege in Zotero\n", $zoteroCount);
 
 $manualLit = [];
-$found = 0;
+$foundFulltext = 0;
 foreach(file('Literaturverzeichnis_Diss.txt') as $line) {
 	$line = trim($line);
 	if (!$line) continue;
@@ -22,18 +22,25 @@ foreach(file('Literaturverzeichnis_Diss.txt') as $line) {
 		continue;
 	}
 	if ( !empty($entry['title'])) {
-		$zoteroEntry = $titleQuery->executeQuery(['title' => $entry['title']])->fetchOne();
-		if ($zoteroEntry) {
-			$found++;
-			// TODO compare entries
+		$titleForQuery = preg_replace("/[^\\p{L} ]/u", '', $entry['title']);
+		if (!trim($titleForQuery)) {
+			echo "\n Empty search title: $line, {$entry['title']} \n";
+			continue;
 		}
+		$zoteroEntry = $fulltextQuery->executeQuery(['title' => $titleForQuery])->fetchOne();
+		if ( $zoteroEntry ) {
+			$foundFulltext++;
+			$json = json_decode($zoteroEntry,true);
+			//printf("Found zotero '%s' for '%s' (%s)\n", $json['title'], $line, $titleForQuery);
+		}
+
 	} else {
 		printf("No title found for '%s'\n", $line);
 	}
-
 
 	$manualLit[] = $entry;
 }
 
 printf("%d eintraege in LibreOffice\n", count($manualLit));
-printf("%d eintraege in Zotero gefunden", $found);
+printf("%d eintraege in Zotero gefunden\n", $foundFulltext);
+

@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 require __DIR__ . '/vendor/autoload.php';
 
-$db = \Doctrine\DBAL\DriverManager::getConnection([ 'url' => 'sqlite://./literature.db']);
+$db = \Doctrine\DBAL\DriverManager::getConnection(['url' => 'sqlite://./literature.db']);
 
-$db->executeStatement('DELETE FROM zotero_creators_entries' );
+$db->executeStatement('DELETE FROM zotero_creators_entries');
 $db->executeStatement('DELETE FROM zotero_creator');
-$db->executeStatement('DELETE FROM zotero_entry' );
+$db->executeStatement('DELETE FROM zotero_entry');
+$db->executeStatement('DELETE FROM zotero_title');
 
 $authorQuery = $db->createQueryBuilder();
 $authorQuery->select('id')
@@ -15,14 +16,14 @@ $authorQuery->select('id')
 	->where('lastname=:lastName')
 	->andWhere('firstName=:firstName');
 
-foreach(glob("zotero_*.json") as $zoteroFile) {
+foreach (glob("zotero_*.json") as $zoteroFile) {
 	$json = json_decode(file_get_contents($zoteroFile), true);
 	printf("\nReading file %s", $zoteroFile);
-	foreach( $json as $entry ) {
+	foreach ($json as $entry) {
 		// ignore library, links and metadata
 		$entry = $entry['data'];
 		// Skip attachments and highlights for now
-		if ( $entry['itemType'] === 'attachment' || $entry['itemType'] === 'highlight' || $entry['itemType'] === 'annotation') continue;
+		if ($entry['itemType'] === 'attachment' || $entry['itemType'] === 'highlight' || $entry['itemType'] === 'annotation') continue;
 
 		if (empty($entry['title'])) {
 			echo "\nEmpty title\n";
@@ -32,11 +33,11 @@ foreach(glob("zotero_*.json") as $zoteroFile) {
 
 		//printf("Importing '%s' ... ", $entry['title']);
 
-		$db->insert('zotero_entry', ['title' => $entry['title'], 'key' => $entry['key'], 'data' => json_encode( $entry, JSON_PRETTY_PRINT ) ]);
-		$entryId = intval( $db->lastInsertId() );
+		$db->insert('zotero_entry', ['title' => $entry['title'], 'key' => $entry['key'], 'data' => json_encode($entry, JSON_PRETTY_PRINT)]);
+		$entryId = intval($db->lastInsertId());
 
-		foreach( $entry['creators'] as $creator ) {
-			if ( !isset($creator['firstName']) ) {
+		foreach ($entry['creators'] as $creator) {
+			if (!isset($creator['firstName'])) {
 				if (isset($creator['name'])) {
 					$creatorData = [
 						'firstName' => '',
@@ -57,11 +58,11 @@ foreach(glob("zotero_*.json") as $zoteroFile) {
 			$authorId = $authorQuery->setParameter('firstName', $creatorData['firstName'])
 				->setParameter('lastName', $creatorData['lastName'])
 				->fetchOne();
-			if (intval($authorId) === 0 ) {
+			if (intval($authorId) === 0) {
 				$db->insert('zotero_creator', $creatorData);
 				$authorId = $db->lastInsertId();
 			}
-			$db->insert( 'zotero_creators_entries', [
+			$db->insert('zotero_creators_entries', [
 				'author_id' => $authorId,
 				'entry_id' => $entryId,
 				'creatorType' => $creator['creatorType'],
@@ -73,3 +74,5 @@ foreach(glob("zotero_*.json") as $zoteroFile) {
 	}
 	echo "\n------------------\n";
 }
+
+$db->executeQuery("INSERT INTO zotero_titles(rowid, title) SELECT id, title FROM zotero_entry");

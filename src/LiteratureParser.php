@@ -7,7 +7,7 @@ class LiteratureParser
 {
 	public static function parseEntry(string $line): array
 	{
-		[$authorAndYearSection, $titleAndOtherStuff] = explode(":", $line);
+		[$authorAndYearSection, $titleAndOtherStuff] = explode(":", $line, 2);
 		$authorsAndYears = self::parseAuthorsAndYears($authorAndYearSection);
 		$titleAndOtherStuff = self::parseTitleAndOtherStuff( $titleAndOtherStuff );
 		return [
@@ -77,14 +77,14 @@ class LiteratureParser
 			$title = substr($titleAndOtherStuff, 0, $matches[0][1] );
 			$otherStuff = substr($titleAndOtherStuff, $matches[1][1]);
 			return [
-				'title' => trim($title, ' ",„“'),
+				'title' => $title,
 				// TODO parse other parts (publisher, place, type of entry)
 			];
 		} else {
 			// For now, assume a book and title of books ends with dot.
 			$parts = explode('. ', $titleAndOtherStuff);
 			return [
-				'title' => trim($parts[0], ' ",„“'),
+				'title' => $parts[0],
 				'itemType' => 'book'
 				// TODO parse other parts (publisher, place)
 			];
