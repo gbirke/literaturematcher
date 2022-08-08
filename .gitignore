@@ -12,3 +12,6 @@ composer.phar
 
 /phpunit.xml
 
+## App
+
+literature.db
