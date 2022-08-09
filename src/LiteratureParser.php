@@ -10,9 +10,11 @@ class LiteratureParser
 		[$authorAndYearSection, $titleAndOtherStuff] = explode(":", $line, 2);
 		$authorsAndYears = self::parseAuthorsAndYears($authorAndYearSection);
 		$titleAndOtherStuff = self::parseTitleAndOtherStuff( $titleAndOtherStuff );
+		$creators = array_merge( $authorsAndYears['creators'], $titleAndOtherStuff['creators']);
 		return [
 			...$titleAndOtherStuff,
-			...$authorsAndYears
+			...$authorsAndYears,
+			'creators' => $creators
 		];
 	}
 
@@ -20,12 +22,12 @@ class LiteratureParser
 	{
 		if (preg_match('/\s*\((\d{4}|\d{4}\/\d{4})\)( \[\d{4}])?/', $authorAndYearSection, $matches)) {
 			$authorString = substr($authorAndYearSection, 0, -strlen($matches[0]));
-			return ['creators' => self::parseAuthors($authorString), 'date' => $matches[1] . ($matches[2] ?? '')];
+			return ['creators' => self::parseCreators($authorString), 'date' => $matches[1] . ($matches[2] ?? '')];
 		}
-		return ['creators' => self::parseAuthors($authorAndYearSection), 'date' => ''];
+		return ['creators' => self::parseCreators($authorAndYearSection), 'date' => ''];
 	}
 
-	public static function parseAuthors(string $authorString): array
+	public static function parseCreators(string $authorString, string $creatorType = 'author'): array
 	{
 		$authorStrings = preg_split('/\s*[&;]\s*/', $authorString);
 		$authorStrings = array_reduce(
@@ -42,17 +44,17 @@ class LiteratureParser
 			[]
 		);
 
-		return array_map([LiteratureParser::class, 'parseOneAuthor'], $authorStrings);
+		return array_map(fn($authorString) => self::parseOneAuthor($authorString, $creatorType), $authorStrings);
 	}
 
-	public static function parseOneAuthor(string $authorString): array
+	public static function parseOneAuthor(string $authorString, string $creatorType): array
 	{
 
 		$nameParts = explode(', ', $authorString, 2);
 
 
 		return [
-			'creatorType' => 'author',
+			'creatorType' => $creatorType,
 			'firstName' => $nameParts[1] ?? '',
 			'lastName' => $nameParts[0]
 		];
@@ -74,7 +76,8 @@ class LiteratureParser
 	public static function parseTitleAndOtherStuff(string $titleAndOtherStuff): array
 	{
 		$result = [
-			'potentialItemTypes' => []
+			'potentialItemTypes' => [],
+			'creators' => []
 		];
 		// Examples
 		// London: the Women’s Press
@@ -100,16 +103,32 @@ class LiteratureParser
 
 			// Recognize and remove pages at the end
 			if (preg_match('/,?\s*S[.\s]+(\d+(\s*-\s*\d+)?)\s*$/', $otherStuff, $matches, PREG_OFFSET_CAPTURE ) ) {
-				$result['pages'] = $matches[1][1];
+				$result['pages'] = $matches[1][0];
 				$otherStuff = substr($otherStuff, 0, $matches[0][1]);
 			}
-			$result['debugOtherStuff']=$otherStuff;
+			//$result['debugOtherStuff']=$otherStuff;
 
+			// Detect book sections (vs journal articles) by looking for a place and publisher at the end
 			if (preg_match($placeAndPublisherRegex, $otherStuff, $matches, PREG_OFFSET_CAPTURE) ) {
 				$result['place'] = $matches[1][0];
 				$result['publisher'] = $matches[2][0];
 				$result['itemType'] = "bookSection";
 				$result['potentialItemTypes'][] = 'bookSection';
+
+				$otherStuff = substr( $otherStuff, 0, $matches[0][1]);
+				$editorMarker = preg_match('/\(Hg\.?\)[:.]?|:/', $otherStuff, $matches, PREG_OFFSET_CAPTURE );
+				if ( $editorMarker !== false ) {
+					$editorSection = trim(substr($otherStuff, 0, $matches[0][1]));
+					// Remove duplicated year from editor section. We might add it back as a different field if it's different
+					$editorSection = preg_replace('/\s*\(\d{4}\)\s*$/', '', $editorSection);
+					$result['creators'] = self::parseCreators( $editorSection, 'editor' );
+					$result['bookTitle'] = preg_replace(
+						'/[\s.]+$/',
+						'',
+						substr( $otherStuff, $matches[0][1] + strlen( $matches[0][0] ) )
+					);
+				}
+
 			} else {
 				$result['itemType'] = "journalArticle";
 				$result['potentialItemTypes'][] = 'journalArticle';
