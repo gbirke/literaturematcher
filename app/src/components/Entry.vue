@@ -1,17 +1,17 @@
 <script setup>
 	import EntryList from "./EntryList.vue";
 	const props = defineProps({
-		entry: Object
+		entry: Object,
+		entryIndex: Number
 	});
 
 
 	const zoteroEntryCount = Object.keys(props.entry.zoteroEntry).length;
-	const manualEntryCount = Object.keys(props.entry.manualEntry).length;
 
 	const classNames = [
 		'entry',
 		zoteroEntryCount>0 ? 'has-zotero-entry':'no-zotero-entry',
-		manualEntryCount<zoteroEntryCount ? 'bad-quality': ''
+			props.entry.reloading ? 'is-reloading' : ''
 	];
 
 
@@ -19,7 +19,12 @@
 
 <template>
 	<div :class="classNames.join(' ')">
-		<div class="raw-line">{{entry.line}}</div>
+		<div class="raw-line" :data-line-number="entry.lineNumber">
+			<div class="reload-container">
+				<button @click="$emit('reloadEntry', entry.lineNumber, entryIndex)" :disabled="entry.reloading">Reload</button>
+			</div>
+			{{entry.line}}
+		</div>
 		<div class="error" v-if="entry.error">{{entry.error}}</div>
 		<div class="manual-entry" :title="entry.line">
 			<EntryList :entry="entry.manualEntry" />
@@ -63,9 +68,13 @@
 		background-color: lightgreen;
 	}
 
-	.bad-quality {
-		background-color: #ffffaa;
+	.reload-container {
+		float: right;
+		padding: 0 0.5rem;
 	}
 
+	.is-reloading {
+		opacity: 0.5;
+	}
 
 </style>

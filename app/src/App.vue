@@ -20,6 +20,16 @@ fetchEntries();
 
 const zoteroCount = computed(() => entries.value.filter(entry => Object.keys(entry.zoteroEntry).length > 0).length )
 
+function onReloadEntry(lineNumber, entryIndex) {
+	entries.value[entryIndex].reloading = true;
+	fetch(`/api/entry/${lineNumber}`).then(response => {
+		response.json().then(data => {
+			entries.value[entryIndex] = data
+			entries.value[entryIndex].reloading = false;
+		});
+	})
+}
+
 </script>
 
 <template>
@@ -27,15 +37,20 @@ const zoteroCount = computed(() => entries.value.filter(entry => Object.keys(ent
 		<div v-if="loading">
 			Lade Einträge ....
 		</div>
-		<div>{{entries.length}} Einträge ({{zoteroCount}} in Zotero)</div>
-		<template v-for="entry in entries" :key="entry.lineNumber">
-			<Entry :entry="entry"/>
+		<div class="intro">{{entries.length}} Einträge ({{zoteroCount}} in Zotero) <button @click="fetchEntries">Reload All</button></div>
+
+		<template v-for="(entry, index) in entries" :key="entry.lineNumber">
+			<Entry :entry="entry" v-on:reloadEntry="onReloadEntry" :entryIndex="index" />
 		</template>
 
   </main>
 </template>
 
 <style scoped>
+	.intro {
+		margin-bottom: 1rem;
+	}
+
 	table {
 		width: 100%;
 	}
