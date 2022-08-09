@@ -20,6 +20,7 @@
 <template>
 	<div :class="classNames.join(' ')">
 		<div class="raw-line">{{entry.line}}</div>
+		<div class="error" v-if="entry.error">{{entry.error}}</div>
 		<div class="manual-entry" :title="entry.line">
 			<EntryList :entry="entry.manualEntry" />
 		</div>
@@ -48,6 +49,10 @@
 
 	.has-zotero-entry .raw-line {
 		grid-column-start: span 2;
+	}
+
+	.error {
+		background-color: red;
 	}
 
 	.raw-line {
