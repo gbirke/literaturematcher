@@ -78,7 +78,7 @@ class LiteratureParser
 		// London: the Women’s Press
 		// München: Springer
 		// language=regexp
-		$placeAndPublisherRegex = '!([\\p{L}/ ]+):\s+([\\p{L}\'’ ]+)$!';
+		$placeAndPublisherRegex = '!([\\p{L}/ ]+):\s+([\\p{L}\'’ ]+)$!u';
 
 		// Source: https://stackoverflow.com/a/3809435
 		$urlRegexSnippet = 'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)';
