@@ -13,6 +13,8 @@ import Creators from './Creators.vue';
 		dateAdded: 1,
 		dateModified: 1,
 		tags: 1,
+		// potentialItemTypes: 1,
+		creators: 1,
 	}
 
 </script>
@@ -22,9 +24,9 @@ import Creators from './Creators.vue';
 		<template v-for="(value, key) in entry" :key="key">
 			<template v-if="value && !skipKeys[key]">
 				<dt>{{key}}</dt>
-				<dd v-if="key !== 'creators'">{{value}}</dd>
-				<Creators v-else :creators="value" />
+				<dd>{{value}}</dd>
 			</template>
+			<Creators v-if="key === 'creators'" :creators="value" />
 		</template>
 	</dl>
 </template>

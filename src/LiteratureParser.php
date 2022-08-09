@@ -73,7 +73,9 @@ class LiteratureParser
 
 	public static function parseTitleAndOtherStuff(string $titleAndOtherStuff): array
 	{
-		$result = [];
+		$result = [
+			'potentialItemTypes' => []
+		];
 		// Examples
 		// London: the Women’s Press
 		// München: Springer
@@ -82,13 +84,19 @@ class LiteratureParser
 
 		// Source: https://stackoverflow.com/a/3809435
 		$urlRegexSnippet = 'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)';
+		$urlRequestedRegex = "/;?\s*$urlRegexSnippet,?\s*abgerufen\s*am[0-9 .]+/";
+
+		if (preg_match($urlRequestedRegex, $titleAndOtherStuff)) {
+			$result['potentialItemTypes'][] = 'webpage';
+		}
+
 
 		if (preg_match('/\s*[Ii]n:\s*(.*$)/', $titleAndOtherStuff, $matches, PREG_OFFSET_CAPTURE ) ) {
 			$result['title'] = substr($titleAndOtherStuff, 0, $matches[0][1] );
 			$otherStuff = substr($titleAndOtherStuff, $matches[1][1]);
 
 			// Clean up notes
-			$otherStuff = preg_replace("/;?\s*$urlRegexSnippet,?\s*abgerufen\s*am[0-9 .]+/", '', $otherStuff);
+			$otherStuff = preg_replace($urlRequestedRegex, '', $otherStuff);
 
 			// Recognize and remove pages at the end
 			if (preg_match('/,?\s*S[.\s]+(\d+(\s*-\s*\d+)?)\s*$/', $otherStuff, $matches, PREG_OFFSET_CAPTURE ) ) {
@@ -101,8 +109,10 @@ class LiteratureParser
 				$result['place'] = $matches[1][0];
 				$result['publisher'] = $matches[2][0];
 				$result['itemType'] = "bookSection";
+				$result['potentialItemTypes'][] = 'bookSection';
 			} else {
 				$result['itemType'] = "journalArticle";
+				$result['potentialItemTypes'][] = 'journalArticle';
 			}
 
 			// TODO parse other parts (publisher, place, type of entry)
@@ -113,6 +123,7 @@ class LiteratureParser
 			$result['title'] = $parts[0];
 			// TODO check for URL, it might be an internet page
 			$result['itemType'] = 'book';
+			$result['potentialItemTypes'][] = 'book';
 
 			$result['debug']=$parts[1] ?? '';
 
