@@ -8,39 +8,54 @@ $zoteroCount = $db->executeQuery("SELECT COUNT(*) from zotero_entry")->fetchOne(
 
 $fulltextQuery = $db->prepare( "SELECT data from zotero_entry ze JOIN zotero_titles zt ON ze.id=zt.rowid WHERE zt.title MATCH :title" );
 
-printf("%d eintraege in Zotero\n", $zoteroCount);
-
-$manualLit = [];
+$entries = [];
 $foundFulltext = 0;
-foreach(file('Literaturverzeichnis_Diss.txt') as $line) {
+foreach(file('Literaturverzeichnis_Diss.txt') as $lineNumber => $line) {
 	$line = trim($line);
 	if (!$line) continue;
 	try {
 		$entry = \Birke\LiteratureMatcher\LiteratureParser::parseEntry($line);
 	} catch (TypeError) {
-		printf("Could not parse '%s'\n", $line);
+			$entries[] = [
+				'lineNumber' => $lineNumber,
+				'line' => $line,
+				'error' => printf("Parse Error" ),
+				'manualEntry' => [],
+				'zoteroEntry' => []
+		];
 		continue;
 	}
+	$zoteroEntry = [];
 	if ( !empty($entry['title'])) {
 		$titleForQuery = preg_replace("/[^\\p{L} ]/u", '', $entry['title']);
 		if (!trim($titleForQuery)) {
 			echo "\n Empty search title: $line, {$entry['title']} \n";
 			continue;
 		}
-		$zoteroEntry = $fulltextQuery->executeQuery(['title' => $titleForQuery])->fetchOne();
-		if ( $zoteroEntry ) {
+		$zoteroEntryData = $fulltextQuery->executeQuery(['title' => $titleForQuery])->fetchOne();
+		if ( $zoteroEntryData ) {
 			$foundFulltext++;
-			$json = json_decode($zoteroEntry,true);
+			$zoteroEntry = json_decode($zoteroEntryData,true);
 			//printf("Found zotero '%s' for '%s' (%s)\n", $json['title'], $line, $titleForQuery);
 		}
 
 	} else {
-		printf("No title found for '%s'\n", $line);
+		$entries[] = [
+			'lineNumber' => $lineNumber,
+			'line' => $line,
+			'error' => 'No title found',
+			'manualEntry' => [],
+			'zoteroEntry' => []
+		];
+		continue;
 	}
 
-	$manualLit[] = $entry;
+	$entries[] = [
+		'lineNumber' => $lineNumber,
+		'line' => $line,
+		'manualEntry' => $entry,
+		'zoteroEntry' => $zoteroEntry
+	];
 }
 
-printf("%d eintraege in LibreOffice\n", count($manualLit));
-printf("%d eintraege in Zotero gefunden\n", $foundFulltext);
-
+file_put_contents( 'literature.json.', json_encode($entries,JSON_PRETTY_PRINT));
