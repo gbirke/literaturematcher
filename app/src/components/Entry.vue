@@ -27,7 +27,7 @@
 		</div>
 		<div class="error" v-if="entry.error">{{entry.error}}</div>
 		<div class="manual-entry" :title="entry.line">
-			<EntryList :entry="entry.manualEntry" :comparison-entry="entry.zoteroEntry" />
+			<EntryList :entry="entry.manualEntry" :comparison-entry="{}" />
 			<p><a :href="`/api/bibtex-entry/${entry.lineNumber}`">Download</a></p>
 		</div>
 

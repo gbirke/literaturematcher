@@ -35,7 +35,7 @@ import Creators from './Creators.vue';
 		<template v-for="(value, key) in entry" :key="key">
 			<template v-if="value && !skipKeys[key]">
 				<dt>{{key}}</dt>
-				<dd :class="keyClasses[key]??''">'{{value}}'</dd>
+				<dd :class="keyClasses[key]??''">{{value}}</dd>
 			</template>
 			<Creators v-if="key === 'creators'" :creators="value" />
 		</template>
