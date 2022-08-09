@@ -6,7 +6,7 @@ $entries = [];
 
 $container = require_once __DIR__ . '/src/container.php';
 
-$sourceFile = $container->get('SourceFile');
+$sourceFile = $container->get(\Birke\LiteratureMatcher\ManualLiteratureFile::class);
 $matcher = $container->get(\Birke\LiteratureMatcher\LiteratureMatcher::class);
 
 foreach( $sourceFile->getLines() as $lineNumber => $line ) {

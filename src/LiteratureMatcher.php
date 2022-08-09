@@ -18,7 +18,6 @@ class LiteratureMatcher
 		} catch (TypeError) {
 			return $this->newErrorEntry( $line, $lineNumber, [], "Parse Error" );
 		}
-		$zoteroEntry = [];
 		if ( empty($entry['title'])) {
 			return $this->newErrorEntry( $line, $lineNumber, $entry, 'No title found');
 		}
@@ -28,7 +27,7 @@ class LiteratureMatcher
 			return $this->newErrorEntry( $line, $lineNumber, $entry, 'Trimmed title was empty');
 
 		}
-		$zoteroEntryData = $this->zoteroRepository->getEntryByTitle( $titleForQuery );
+		$zoteroEntry = $this->zoteroRepository->getEntryByTitle( $titleForQuery );
 		return [
 			'lineNumber' => $lineNumber,
 			'line' => $line,

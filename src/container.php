@@ -7,11 +7,11 @@ use Birke\LiteratureMatcher\ZoteroRepository;
 $builder = new DI\ContainerBuilder();
 $builder->addDefinitions([
 	// Configuration
-	'db.config' => [ 'url' => 'sqlite://./literature.db'],
-	'sourceFileName' => 'Literaturverzeichnis_Diss.txt',
+	'db.config' => [ 'url' => 'sqlite:///'.realpath( sprintf('%s/../literature.db', __DIR__ ) ) ],
+	'sourceFileName' => __DIR__ . '/../Literaturverzeichnis_Diss.txt',
 
 	// Factories
-	'SourceFile' => Di\create(ManualLiteratureFile::class)->constructor( Di\get('sourceFileName') ),
+	ManualLiteratureFile::class => Di\create()->constructor( Di\get('sourceFileName') ),
 	ZoteroRepository::class => Di\create()->constructor( Di\get('db.config') ),
 ]);
 return $builder->build();
