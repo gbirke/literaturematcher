@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aabe8a451bb11a665a44aea4e989d95e",
+    "content-hash": "3851e7eebab6976193ee57c245aa6234",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -1454,6 +1454,130 @@
                 "source": "https://github.com/ralouphie/getallheaders/tree/develop"
             },
             "time": "2019-03-08T08:55:37+00:00"
+        },
+        {
+            "name": "researchgate/converter",
+            "version": "1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/researchgate/converter.git",
+                "reference": "78cf6be56bffcb7c59866b95b1863923d1f324fa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/researchgate/converter/zipball/78cf6be56bffcb7c59866b95b1863923d1f324fa",
+                "reference": "78cf6be56bffcb7c59866b95b1863923d1f324fa",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.4 | ^8.0 | ^8.1",
+                "researchgate/libris": "^2.3.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.1",
+                "phpstan/phpstan": "^0.12.42",
+                "phpunit/phpunit": "^9.3",
+                "squizlabs/php_codesniffer": "^3.5",
+                "vimeo/psalm": "^4.9"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "library/bibtexParse/PARSEENTRIES.php",
+                    "library/bibtexParse/PARSECREATORS.php",
+                    "library/bibtexParse/PARSEMONTH.php",
+                    "library/bibtexParse/PARSEPAGE.php"
+                ],
+                "psr-4": {
+                    "Geissler\\Converter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Benjamin Geißler",
+                    "email": "benjamin.geissler@gmail.com"
+                },
+                {
+                    "name": "Níckolas Da Silva",
+                    "email": "nickolas@phpsp.org.br"
+                }
+            ],
+            "description": "A small library to convert different bibliography formats into each other. Forked from 'geissler/converter'.",
+            "homepage": "https://github.com/researchgate/converter",
+            "keywords": [
+                "Bibliography",
+                "RIS",
+                "bibtex",
+                "csl",
+                "endnote"
+            ],
+            "support": {
+                "issues": "https://github.com/researchgate/converter/issues",
+                "source": "https://github.com/researchgate/converter/tree/1.2.0"
+            },
+            "time": "2022-06-17T08:55:12+00:00"
+        },
+        {
+            "name": "researchgate/libris",
+            "version": "2.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/researchgate/libris.git",
+                "reference": "97e8a7f48c01aadf53da2e15bd5191fff4fac6ac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/researchgate/libris/zipball/97e8a7f48c01aadf53da2e15bd5191fff4fac6ac",
+                "reference": "97e8a7f48c01aadf53da2e15bd5191fff4fac6ac",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 | ^8.0 | ^8.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.1",
+                "phan/phan": "^5.2",
+                "phpstan/phpstan": "^1.7",
+                "phpunit/phpunit": "^9.5",
+                "vimeo/psalm": "^4.23"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "LibRIS\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LibRIS\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT or GPLv2"
+            ],
+            "authors": [
+                {
+                    "name": "M Butcher",
+                    "homepage": "http://technosophos.com"
+                }
+            ],
+            "description": "An RIS parser. RIS is a format for reference metadata. A fork of technosophos/LibRIS.",
+            "homepage": "https://github.com/thompsonsj/LibRIS",
+            "keywords": [
+                "Bibliography",
+                "File parser",
+                "RIS",
+                "Reference"
+            ],
+            "support": {
+                "source": "https://github.com/researchgate/libris/tree/2.3.0"
+            },
+            "time": "2022-06-17T08:47:02+00:00"
         },
         {
             "name": "slim/slim",

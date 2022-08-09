@@ -9,9 +9,16 @@
         "doctrine/dbal": "^3.4",
         "php-di/php-di": "^6.4",
         "slim/slim": "^4.10",
-        "php-di/slim-bridge": "^3.2"
+        "php-di/slim-bridge": "^3.2",
+        "researchgate/converter": "^1.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5"
+    },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/researchgate/libris.git"
     }
+  ]
 }
