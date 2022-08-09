@@ -6,6 +6,7 @@ $client = new \GuzzleHttp\Client([
 	'base_uri' => 'https://api.zotero.org/users/3658329/items',
 	'headers' => [
 		'Accept' => 'application/json',
+		// TODO use valid key from environment, this one does not work
 		'Zotero-API-Key' => 'Yt3z9Wg5SP2qADqrs1wpyGKy'
 	]
 ]);
