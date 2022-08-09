@@ -2,6 +2,7 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
+// TODO move this to DI container
 $client = new \GuzzleHttp\Client([
 	'base_uri' => 'https://api.zotero.org/users/3658329/items',
 	'headers' => [

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/vendor/autoload.php';
 
+// TODO move parts of this to container and repo
 $db = \Doctrine\DBAL\DriverManager::getConnection(['url' => 'sqlite://./literature.db']);
 
 $db->executeStatement('DELETE FROM zotero_creators_entries');
