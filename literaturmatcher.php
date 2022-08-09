@@ -58,4 +58,4 @@ foreach(file('Literaturverzeichnis_Diss.txt') as $lineNumber => $line) {
 	];
 }
 
-file_put_contents( 'literature.json.', json_encode($entries,JSON_PRETTY_PRINT));
+file_put_contents( 'app/src/literature.json', json_encode($entries, JSON_PRETTY_PRINT));
