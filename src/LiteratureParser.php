@@ -95,7 +95,7 @@ class LiteratureParser
 
 
 		if (preg_match('/\s*[Ii]n:\s*(.*$)/', $titleAndOtherStuff, $matches, PREG_OFFSET_CAPTURE ) ) {
-			$result['title'] = substr($titleAndOtherStuff, 0, $matches[0][1] );
+			$result['title'] = trim( substr($titleAndOtherStuff, 0, $matches[0][1] ) );
 			$otherStuff = substr($titleAndOtherStuff, $matches[1][1]);
 
 			// Clean up notes
@@ -110,23 +110,28 @@ class LiteratureParser
 
 			// Detect book sections (vs journal articles) by looking for a place and publisher at the end
 			if (preg_match($placeAndPublisherRegex, $otherStuff, $matches, PREG_OFFSET_CAPTURE) ) {
-				$result['place'] = $matches[1][0];
-				$result['publisher'] = $matches[2][0];
+				$result['place'] = trim($matches[1][0]);
+				$result['publisher'] = trim($matches[2][0]);
 				$result['itemType'] = "bookSection";
 				$result['potentialItemTypes'][] = 'bookSection';
 
 				$otherStuff = substr( $otherStuff, 0, $matches[0][1]);
-				$editorMarker = preg_match('/\(Hg\.?\)[:.]?|:/', $otherStuff, $matches, PREG_OFFSET_CAPTURE );
-				if ( $editorMarker !== false ) {
+				if ( preg_match('/\(Hg\.?\)[:.]?|:/', $otherStuff, $matches, PREG_OFFSET_CAPTURE ) ) {
 					$editorSection = trim(substr($otherStuff, 0, $matches[0][1]));
 					// Remove duplicated year from editor section. We might add it back as a different field if it's different
 					$editorSection = preg_replace('/\s*\(\d{4}\)\s*$/', '', $editorSection);
 					$result['creators'] = self::parseCreators( $editorSection, 'editor' );
-					$result['bookTitle'] = preg_replace(
+					$bookTitle = preg_replace(
+						// Replace trailing dots and spaces
 						'/[\s.]+$/',
 						'',
 						substr( $otherStuff, $matches[0][1] + strlen( $matches[0][0] ) )
 					);
+					// check for marker that the book title matches the bookSection title
+					if (preg_match('/\(ders\.?\)|ders\.:/i', $bookTitle)) {
+						$bookTitle = $result['title'];
+					}
+					$result['bookTitle'] = trim($bookTitle);
 				}
 
 			} else {
@@ -147,7 +152,7 @@ class LiteratureParser
 			$result['debug']=$parts[1] ?? '';
 
 			if (!empty($parts[1]) &&preg_match($placeAndPublisherRegex, $parts[1], $matches, PREG_OFFSET_CAPTURE) ) {
-				$result['place'] = $matches[1][0];
+				$result['place'] = trim( $matches[1][0]);
 				$result['publisher'] = $matches[2][0];
 			}
 
