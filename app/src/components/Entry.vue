@@ -2,7 +2,8 @@
 	import EntryList from "./EntryList.vue";
 	const props = defineProps({
 		entry: Object,
-		entryIndex: Number
+		entryIndex: Number,
+		baseUrl: String
 	});
 
 
@@ -28,7 +29,7 @@
 		<div class="error" v-if="entry.error">{{entry.error}}</div>
 		<div class="manual-entry" :title="entry.line">
 			<EntryList :entry="entry.manualEntry" :comparison-entry="{}" />
-			<p><a :href="`/api/bibtex-entry/${entry.lineNumber}`">Download</a></p>
+			<p><a :href="`${baseUrl}/bibtex-entry/${entry.lineNumber}`">Download</a></p>
 		</div>
 
 		<div class="zotero-entry" v-if="zoteroEntryCount>0">

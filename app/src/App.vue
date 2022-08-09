@@ -2,13 +2,17 @@
 import {ref, computed} from "vue";
 import Entry from './components/Entry.vue';
 
+const baseUrl = import.meta.env.VITE_API_URL;
+
+console.log("burl", baseUrl);
+
 const loading = ref(true);
 const entries = ref([]);
 
 function fetchEntries() {
 	loading.value = true;
 	// TODO avoid hard-coding
-	fetch('/api/entries').then(response => {
+	fetch(`${baseUrl}/entries`).then(response => {
 		response.json().then(data => {
 			entries.value = data
 			loading.value = false;
@@ -22,7 +26,7 @@ const zoteroCount = computed(() => entries.value.filter(entry => Object.keys(ent
 
 function onReloadEntry(lineNumber, entryIndex) {
 	entries.value[entryIndex].reloading = true;
-	fetch(`/api/entry/${lineNumber}`).then(response => {
+	fetch(`${baseUrl}/entry/${lineNumber}`).then(response => {
 		response.json().then(data => {
 			entries.value[entryIndex] = data
 			entries.value[entryIndex].reloading = false;
@@ -40,7 +44,12 @@ function onReloadEntry(lineNumber, entryIndex) {
 		<div class="intro">{{entries.length}} Einträge ({{zoteroCount}} in Zotero) <button @click="fetchEntries">Reload All</button></div>
 
 		<template v-for="(entry, index) in entries" :key="entry.lineNumber">
-			<Entry :entry="entry" v-on:reloadEntry="onReloadEntry" :entryIndex="index" />
+			<Entry
+					:entry="entry"
+					:entryIndex="index"
+					:base-url="baseUrl"
+					v-on:reloadEntry="onReloadEntry"
+			/>
 		</template>
 
   </main>
