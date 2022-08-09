@@ -73,22 +73,28 @@ class LiteratureParser
 
 	public static function parseTitleAndOtherStuff(string $titleAndOtherStuff): array
 	{
+		$result = [];
+
 		if (preg_match('/\s*[Ii]n:\s*(.*$)/', $titleAndOtherStuff, $matches, PREG_OFFSET_CAPTURE ) ) {
-			$title = substr($titleAndOtherStuff, 0, $matches[0][1] );
+			$result['title'] = substr($titleAndOtherStuff, 0, $matches[0][1] );
 			$otherStuff = substr($titleAndOtherStuff, $matches[1][1]);
-			return [
-				'title' => $title,
-				// TODO parse other parts (publisher, place, type of entry)
-			];
+
+			if (preg_match('/\s*S[.\s]+(\d+(\s*-\s*\d+)?)\s*$/', $otherStuff, $matches ) ) {
+				$result['itemType'] = "bookSection";
+				$result['pages'] = $matches[1];
+			}
+
+			// TODO parse other parts (publisher, place, type of entry)
+			
 		} else {
 			// For now, assume a book and title of books ends with dot.
 			$parts = explode('. ', $titleAndOtherStuff);
-			return [
-				'title' => $parts[0],
-				'itemType' => 'book'
-				// TODO parse other parts (publisher, place)
-			];
+			$result['title'] = $parts[0];
+			// TODO check for URL, it might be an internet page
+			$result['itemType'] = 'book';
+
 		}
+		return $result;
 	}
 
 
