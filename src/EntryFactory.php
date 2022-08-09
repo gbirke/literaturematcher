@@ -89,6 +89,18 @@ class EntryFactory
 		}
 	}
 
+	private function setIssue($value) {
+		$this->entry->setNumber($value);
+	}
+
+	private function setVolume($value) {
+		$this->entry->setVolume($value);
+	}
+
+	private function setPublicationTitle(string $title) {
+		$this->entry->setJournal($title);
+	}
+
 	private function generateCitationLabel(): string
 	{
 		$parts = [];

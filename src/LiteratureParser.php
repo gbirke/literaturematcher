@@ -133,27 +133,40 @@ class LiteratureParser
 					}
 					$result['bookTitle'] = trim($bookTitle);
 				}
+			} else
+			// journal entry
+			{
+				if (preg_match('/(\d+)\s*(?:\((\d+)\))?/', $otherStuff, $matches, PREG_OFFSET_CAPTURE)) {
+					$publicationTitle = preg_replace(
+					// Replace trailing dots and spaces
+						'/[\s.]+$/',
+						'',
+						substr($otherStuff, 0, $matches[0][1])
+					);
+					$result['publicationTitle'] = trim($publicationTitle);
+					$result['volume'] = $matches[1][0];
+					if(!empty($matches[2])) {
+						$result['issue'] = $matches[2][0];
+					}
 
-			} else {
+				}
 				$result['itemType'] = "journalArticle";
 				$result['potentialItemTypes'][] = 'journalArticle';
 			}
 
-			// TODO parse other parts (publisher, place, type of entry)
-
 		} else {
-			// For now, assume a book and title of books ends with dot.
-			$parts = explode('. ', $titleAndOtherStuff, 2);
-			$result['title'] = $parts[0];
 			// TODO check for URL, it might be an internet page
 			$result['itemType'] = 'book';
 			$result['potentialItemTypes'][] = 'book';
 
-			$result['debug']=$parts[1] ?? '';
-
-			if (!empty($parts[1]) &&preg_match($placeAndPublisherRegex, $parts[1], $matches, PREG_OFFSET_CAPTURE) ) {
+			if (preg_match($placeAndPublisherRegex, $titleAndOtherStuff, $matches, PREG_OFFSET_CAPTURE) ) {
+				$bookTitle = substr($titleAndOtherStuff, 0, $matches[0][1]);
+				// TODO remove quotes and trailing dots/spaces
+				$result['title'] = $bookTitle;
 				$result['place'] = trim( $matches[1][0]);
 				$result['publisher'] = $matches[2][0];
+			} else {
+				$result['title'] = $titleAndOtherStuff;
 			}
 
 		}
