@@ -27,7 +27,7 @@
 		</div>
 		<div class="error" v-if="entry.error">{{entry.error}}</div>
 		<div class="manual-entry" :title="entry.line">
-			<EntryList :entry="entry.manualEntry" />
+			<EntryList :entry="entry.manualEntry" :comparison-entry="entry.zoteroEntry" />
 		</div>
 
 		<div class="zotero-entry" v-if="zoteroEntryCount>0">
@@ -65,7 +65,7 @@
 	}
 
 	.zotero-entry {
-		background-color: lightgreen;
+		background-color: #dfd;
 	}
 
 	.reload-container {

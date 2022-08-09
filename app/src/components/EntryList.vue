@@ -1,7 +1,11 @@
 <script setup>
 import Creators from './Creators.vue';
 	const props = defineProps({
-		entry: Object
+		entry: Object,
+		comparisonEntry: {
+			type: Object,
+			default: {}
+		}
 	});
 
 	const skipKeys = {
@@ -13,9 +17,16 @@ import Creators from './Creators.vue';
 		dateAdded: 1,
 		dateModified: 1,
 		tags: 1,
-		// potentialItemTypes: 1,
+		potentialItemTypes: 1,
 		creators: 1,
 	}
+
+	const keyClasses = Object.keys(props.entry).reduce((accumulatedKeyClasses, key) => {
+		if ( !skipKeys[key] && props.comparisonEntry && props.comparisonEntry.hasOwnProperty(key)) {
+			accumulatedKeyClasses[key] = props.entry[key] === props.comparisonEntry[key] ? 'ok' : 'different'
+		}
+		return accumulatedKeyClasses;
+	}, {} );
 
 </script>
 
@@ -24,7 +35,7 @@ import Creators from './Creators.vue';
 		<template v-for="(value, key) in entry" :key="key">
 			<template v-if="value && !skipKeys[key]">
 				<dt>{{key}}</dt>
-				<dd>{{value}}</dd>
+				<dd :class="keyClasses[key]??''">'{{value}}'</dd>
 			</template>
 			<Creators v-if="key === 'creators'" :creators="value" />
 		</template>
@@ -32,6 +43,10 @@ import Creators from './Creators.vue';
 </template>
 
 <style scoped>
+	.different {
+		background-color: yellow;
+	}
+
 	dl {
 		display: grid;
 		grid-template-columns: max-content 1fr;
