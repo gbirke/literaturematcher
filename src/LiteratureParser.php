@@ -74,24 +74,52 @@ class LiteratureParser
 	public static function parseTitleAndOtherStuff(string $titleAndOtherStuff): array
 	{
 		$result = [];
+		// Examples
+		// London: the Women’s Press
+		// München: Springer
+		// language=regexp
+		$placeAndPublisherRegex = '!([\\p{L}/ ]+):\s+([\\p{L}\'’ ]+)$!';
+
+		// Source: https://stackoverflow.com/a/3809435
+		$urlRegexSnippet = 'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)';
 
 		if (preg_match('/\s*[Ii]n:\s*(.*$)/', $titleAndOtherStuff, $matches, PREG_OFFSET_CAPTURE ) ) {
 			$result['title'] = substr($titleAndOtherStuff, 0, $matches[0][1] );
 			$otherStuff = substr($titleAndOtherStuff, $matches[1][1]);
 
-			if (preg_match('/\s*S[.\s]+(\d+(\s*-\s*\d+)?)\s*$/', $otherStuff, $matches ) ) {
+			// Clean up notes
+			$otherStuff = preg_replace("/;?\s*$urlRegexSnippet,?\s*abgerufen\s*am[0-9 .]+/", '', $otherStuff);
+
+			// Recognize and remove pages at the end
+			if (preg_match('/,?\s*S[.\s]+(\d+(\s*-\s*\d+)?)\s*$/', $otherStuff, $matches, PREG_OFFSET_CAPTURE ) ) {
+				$result['pages'] = $matches[1][1];
+				$otherStuff = substr($otherStuff, 0, $matches[0][1]);
+			}
+			$result['debugOtherStuff']=$otherStuff;
+
+			if (preg_match($placeAndPublisherRegex, $otherStuff, $matches, PREG_OFFSET_CAPTURE) ) {
+				$result['place'] = $matches[1][0];
+				$result['publisher'] = $matches[2][0];
 				$result['itemType'] = "bookSection";
-				$result['pages'] = $matches[1];
+			} else {
+				$result['itemType'] = "journalArticle";
 			}
 
 			// TODO parse other parts (publisher, place, type of entry)
-			
+
 		} else {
 			// For now, assume a book and title of books ends with dot.
-			$parts = explode('. ', $titleAndOtherStuff);
+			$parts = explode('. ', $titleAndOtherStuff, 2);
 			$result['title'] = $parts[0];
 			// TODO check for URL, it might be an internet page
 			$result['itemType'] = 'book';
+
+			$result['debug']=$parts[1] ?? '';
+
+			if (!empty($parts[1]) &&preg_match($placeAndPublisherRegex, $parts[1], $matches, PREG_OFFSET_CAPTURE) ) {
+				$result['place'] = $matches[1][0];
+				$result['publisher'] = $matches[2][0];
+			}
 
 		}
 		return $result;
