@@ -19,6 +19,7 @@
 
 <template>
 	<div :class="classNames.join(' ')">
+		<div class="raw-line">{{entry.line}}</div>
 		<div class="manual-entry" :title="entry.line">
 			<EntryList :entry="entry.manualEntry" />
 		</div>
@@ -43,6 +44,14 @@
 	.has-zotero-entry {
 		display: grid;
 		grid-template-columns: 50% 50%;
+	}
+
+	.has-zotero-entry .raw-line {
+		grid-column-start: span 2;
+	}
+
+	.raw-line {
+		background-color: #eee;
 	}
 
 	.zotero-entry {
