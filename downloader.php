@@ -2,18 +2,12 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-// TODO move this to DI container
-$client = new \GuzzleHttp\Client([
-	'base_uri' => 'https://api.zotero.org/users/3658329/items',
-	'headers' => [
-		'Accept' => 'application/json',
-		// TODO use valid key from environment, this one does not work
-		'Zotero-API-Key' => 'Yt3z9Wg5SP2qADqrs1wpyGKy'
-	]
-]);
+$container = include __DIR__ . '/src/container.php';
 
+$client = $container->get('zotero.client');
 
-for($page=0; $page<=2250; $page+=100) {
+// TODO determine end page from LINK header
+for($page=0; $page<=2450; $page+=100) {
 	$response = $client->get('', ['query' => ['limit' => 100, 'start' => $page]]);
 	$json = $response->getBody()->getContents();
 	$filename = sprintf("zotero_%04d.json", $page);
