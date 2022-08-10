@@ -6,6 +6,7 @@
 		baseUrl: String
 	});
 
+	const showReload = import.meta.env.DEV;
 
 	const zoteroEntryCount = Object.keys(props.entry.zoteroEntry).length;
 
@@ -21,7 +22,7 @@
 <template>
 	<div :class="classNames.join(' ')">
 		<div class="raw-line" :data-line-number="entry.lineNumber">
-			<div class="reload-container">
+			<div class="reload-container" v-if="showReload">
 				<button @click="$emit('reloadEntry', entry.lineNumber, entryIndex)" :disabled="entry.reloading">Reload</button>
 			</div>
 			{{entry.line}}
