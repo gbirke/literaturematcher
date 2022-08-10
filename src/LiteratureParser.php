@@ -83,7 +83,7 @@ class LiteratureParser
 		// London: the Women’s Press
 		// München: Springer
 		// language=regexp
-		$placeAndPublisherRegex = '!([\\p{L}/ ]+):\s+([\\p{L}\'’ ]+)$!u';
+		$placeAndPublisherRegex = '!([\\p{L}/ ]+):\s+([\\p{L}\'’. ]+)$!u';
 
 		// Source: https://stackoverflow.com/a/3809435
 		$urlRegexSnippet = 'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/=]*)';
@@ -113,7 +113,7 @@ class LiteratureParser
 			// Detect book sections (vs journal articles) by looking for a place and publisher at the end
 			if (preg_match($placeAndPublisherRegex, $otherStuff, $matches, PREG_OFFSET_CAPTURE) ) {
 				$result['place'] = trim($matches[1][0]);
-				$result['publisher'] = trim($matches[2][0]);
+				$result['publisher'] = ltrim( self::trimTrailingSpacesAndDots( $matches[2][0] ) );
 				$result['itemType'] = "bookSection";
 				$result['potentialItemTypes'][] = 'bookSection';
 
@@ -160,7 +160,7 @@ class LiteratureParser
 				// TODO remove quotes and trailing dots/spaces
 				$result['title'] = $bookTitle;
 				$result['place'] = trim( $matches[1][0]);
-				$result['publisher'] = $matches[2][0];
+				$result['publisher'] = ltrim( self::trimTrailingSpacesAndDots( $matches[2][0] ) );
 			} else {
 				$result['title'] = $titleAndOtherStuff;
 			}
