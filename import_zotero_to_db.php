@@ -1,21 +1,14 @@
 <?php
 declare(strict_types=1);
 
+use Birke\LiteratureMatcher\ZoteroRepository;
+
 require __DIR__ . '/vendor/autoload.php';
 
-// TODO move parts of this to container and repo
-$db = \Doctrine\DBAL\DriverManager::getConnection(['url' => 'sqlite://./literature.db']);
+$container = include __DIR__ . '/src/container.php';
 
-$db->executeStatement('DELETE FROM zotero_creators_entries');
-$db->executeStatement('DELETE FROM zotero_creator');
-$db->executeStatement('DELETE FROM zotero_entry');
-$db->executeStatement('DELETE FROM zotero_title');
-
-$authorQuery = $db->createQueryBuilder();
-$authorQuery->select('id')
-	->from('zotero_creator')
-	->where('lastname=:lastName')
-	->andWhere('firstName=:firstName');
+/** @var ZoteroRepository $repo */
+$repo = $container->get(ZoteroRepository::class);
 
 foreach (glob("zotero_*.json") as $zoteroFile) {
 	$json = json_decode(file_get_contents($zoteroFile), true);
@@ -34,8 +27,7 @@ foreach (glob("zotero_*.json") as $zoteroFile) {
 
 		//printf("Importing '%s' ... ", $entry['title']);
 
-		$db->insert('zotero_entry', ['title' => $entry['title'], 'key' => $entry['key'], 'data' => json_encode($entry, JSON_PRETTY_PRINT)]);
-		$entryId = intval($db->lastInsertId());
+		$entryId = $repo->insertEntry($entry);
 
 		foreach ($entry['creators'] as $creator) {
 			if (!isset($creator['firstName'])) {
@@ -47,7 +39,7 @@ foreach (glob("zotero_*.json") as $zoteroFile) {
 				} else {
 					echo "\nNo valid names for creator found";
 					var_export($entry);
-					continue 2;
+					continue;
 				}
 
 			} else {
@@ -56,19 +48,13 @@ foreach (glob("zotero_*.json") as $zoteroFile) {
 					'lastName' => $creator['lastName']
 				];
 			}
-			$authorId = $authorQuery->setParameter('firstName', $creatorData['firstName'])
-				->setParameter('lastName', $creatorData['lastName'])
-				->fetchOne();
-			if (intval($authorId) === 0) {
-				$db->insert('zotero_creator', $creatorData);
-				$authorId = $db->lastInsertId();
+			$authorId = $repo->getCreator( $creatorData );
+			try {
+				$repo->insertCreatorRelation( $authorId, $entryId, $creator['creatorType'], $entry['key']);
+			} catch (\Exception $e) {
+				error_log($e->getMessage());
+				print_r($entry);
 			}
-			$db->insert('zotero_creators_entries', [
-				'author_id' => $authorId,
-				'entry_id' => $entryId,
-				'creatorType' => $creator['creatorType'],
-				'entry_key' => $entry['key']
-			]);
 		}
 
 		// echo " done\n";
@@ -76,4 +62,4 @@ foreach (glob("zotero_*.json") as $zoteroFile) {
 	echo "\n------------------\n";
 }
 
-$db->executeQuery("INSERT INTO zotero_titles(rowid, title) SELECT id, title FROM zotero_entry");
+$repo->buildFulltextIndex();
