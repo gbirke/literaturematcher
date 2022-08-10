@@ -37,6 +37,7 @@ class EntryFactory
 
 	private function setPlace(string $place) {
 		$this->entry->setPublisherPlace($place);
+		$this->entry->setAddress($place);
 	}
 
 	private function setPages(string $pageRange) {
@@ -50,6 +51,7 @@ class EntryFactory
 
 	private function setBookTitle(string $title)
 	{
+		$this->entry->setContainerTitle( $title );
 		$this->entry->setCollectionTitle($title);
 	}
 

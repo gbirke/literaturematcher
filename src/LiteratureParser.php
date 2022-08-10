@@ -95,7 +95,9 @@ class LiteratureParser
 
 
 		if (preg_match('/\s*[Ii]n:\s*(.*$)/', $titleAndOtherStuff, $matches, PREG_OFFSET_CAPTURE ) ) {
-			$result['title'] = trim( substr($titleAndOtherStuff, 0, $matches[0][1] ) );
+			$result['title'] = ltrim( self::trimTrailingSpacesAndDots(
+				substr($titleAndOtherStuff, 0, $matches[0][1] )
+			) );
 			$otherStuff = substr($titleAndOtherStuff, $matches[1][1]);
 
 			// Clean up notes
@@ -121,10 +123,7 @@ class LiteratureParser
 					// Remove duplicated year from editor section. We might add it back as a different field if it's different
 					$editorSection = preg_replace('/\s*\(\d{4}\)\s*$/', '', $editorSection);
 					$result['creators'] = self::parseCreators( $editorSection, 'editor' );
-					$bookTitle = preg_replace(
-						// Replace trailing dots and spaces
-						'/[\s.]+$/',
-						'',
+					$bookTitle = self::trimTrailingSpacesAndDots(
 						substr( $otherStuff, $matches[0][1] + strlen( $matches[0][0] ) )
 					);
 					// check for marker that the book title matches the bookSection title
@@ -137,10 +136,7 @@ class LiteratureParser
 			// journal entry
 			{
 				if (preg_match('/(\d+)\s*(?:\((\d+)\))?/', $otherStuff, $matches, PREG_OFFSET_CAPTURE)) {
-					$publicationTitle = preg_replace(
-					// Replace trailing dots and spaces
-						'/[\s.]+$/',
-						'',
+					$publicationTitle = self::trimTrailingSpacesAndDots(
 						substr($otherStuff, 0, $matches[0][1])
 					);
 					$result['publicationTitle'] = trim($publicationTitle);
@@ -160,7 +156,7 @@ class LiteratureParser
 			$result['potentialItemTypes'][] = 'book';
 
 			if (preg_match($placeAndPublisherRegex, $titleAndOtherStuff, $matches, PREG_OFFSET_CAPTURE) ) {
-				$bookTitle = substr($titleAndOtherStuff, 0, $matches[0][1]);
+				$bookTitle = self::trimTrailingSpacesAndDots( substr($titleAndOtherStuff, 0, $matches[0][1]) );
 				// TODO remove quotes and trailing dots/spaces
 				$result['title'] = $bookTitle;
 				$result['place'] = trim( $matches[1][0]);
@@ -173,5 +169,8 @@ class LiteratureParser
 		return $result;
 	}
 
+	private static function trimTrailingSpacesAndDots( string $title ): string {
+		return preg_replace('/[\s.]+$/','', $title );
+	}
 
 }
