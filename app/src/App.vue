@@ -39,7 +39,7 @@ function onReloadEntry(lineNumber, entryIndex) {
 		<div v-if="loading">
 			Lade Einträge ....
 		</div>
-		<div class="intro">{{entries.length}} Einträge ({{zoteroCount}} in Zotero) <button @click="fetchEntries">Reload All</button></div>
+		<div v-else class="intro">{{entries.length}} Einträge ({{zoteroCount}} in Zotero) <button @click="fetchEntries">Reload All</button></div>
 
 		<template v-for="(entry, index) in entries" :key="entry.lineNumber">
 			<Entry
