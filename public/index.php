@@ -49,4 +49,6 @@ $app->get('/bibtex-entry/{id}', function ($id, Response $response, ManualLiterat
 		->withHeader('Content-Disposition', sprintf('attachment; filename="%s.bib"', $filename));
 });
 
+$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+
 $app->run();

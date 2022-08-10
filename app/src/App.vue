@@ -4,8 +4,6 @@ import Entry from './components/Entry.vue';
 
 const baseUrl = import.meta.env.VITE_API_URL;
 
-console.log("burl", baseUrl);
-
 const loading = ref(true);
 const entries = ref([]);
 
